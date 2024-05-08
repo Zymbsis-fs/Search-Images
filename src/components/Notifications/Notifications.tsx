@@ -1,6 +1,13 @@
+import { FC } from 'react';
+import { ImgArray } from '../../types';
 import css from './Notifications.module.css';
 
-const Notifications = ({ condition }) => {
+interface NotificationsProps {
+  condition: ImgArray | null;
+}
+
+const Notifications: FC<NotificationsProps> = ({ condition }) => {
+  if (condition === null) return;
   return (
     <>
       {condition.length === 0 ? (

@@ -1,7 +1,8 @@
-import css from './ErrorMessage.module.css';
+import { FC } from 'react';
 import error from '../../img/oops.png';
+import css from './ErrorMessage.module.css';
 
-const ErrorMessage = () => {
+const ErrorMessage: FC<{}> = () => {
   return (
     <div>
       <img

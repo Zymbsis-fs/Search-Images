@@ -1,4 +1,11 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
+
+interface Params {
+  per_page: number;
+  orientation: string;
+  page: number;
+  query: string;
+}
 
 const axiosInstance = axios.create({
   baseURL: 'https://api.unsplash.com',
@@ -9,14 +16,14 @@ const axiosInstance = axios.create({
   },
 });
 
-async function splashRequest(page, query) {
-  const searchParams = {
+async function splashRequest<T>(page: number, query: string): Promise<T> {
+  const searchParams: Params = {
     per_page: 15,
     orientation: 'landscape',
     page: page,
     query: query,
   };
-  const { data } = await axiosInstance.get('/search/photos', {
+  const { data } = await axiosInstance.get<T>('/search/photos', {
     params: searchParams,
   });
   return data;

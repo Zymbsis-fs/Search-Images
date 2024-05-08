@@ -1,7 +1,8 @@
-import css from './Loader.module.css';
+import { FC } from 'react';
 import { TailSpin } from 'react-loader-spinner';
+import css from './Loader.module.css';
 
-const Loader = () => {
+const Loader: FC<{}> = () => {
   return (
     <div className={css.loader}>
       <TailSpin

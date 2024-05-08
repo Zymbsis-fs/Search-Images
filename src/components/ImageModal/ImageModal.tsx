@@ -1,8 +1,16 @@
-import css from './ImageModal.module.css';
 import ReactModal from 'react-modal';
+import { FC } from 'react';
+import { ImgDetails } from '../../types';
 import { FaWindowClose } from 'react-icons/fa';
+import css from './ImageModal.module.css';
 
-const ImageModal = ({ isOpen, image, setter }) => {
+interface ImageModalProps {
+  isOpen: boolean;
+  image: ImgDetails | null;
+  setter: (newValue: boolean) => void;
+}
+
+const ImageModal: FC<ImageModalProps> = ({ isOpen, image, setter }) => {
   ReactModal.setAppElement('#root');
   return (
     <ReactModal

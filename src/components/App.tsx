@@ -1,42 +1,49 @@
-import './App.css';
+import { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { ImgArray, ImgDetails } from '../types';
 import splashRequest from '../splash-api';
 import SearchBar from './SearchBar/SearchBar';
-import Loader from './Loader/Loader';
 import ImageGallery from './ImageGallery/ImageGallery';
 import ImageModal from './ImageModal/ImageModal';
 import LoadMoreBtn from './LoadMoreBtn/LoadMoreBtn';
+import Loader from './Loader/Loader';
 import ErrorMessage from './ErrorMessage/ErrorMessage';
-import { useState, useEffect, useRef, useLayoutEffect } from 'react';
 import Notifications from './Notifications/Notifications';
+import './App.css';
+
+interface SplashData {
+  results: ImgArray;
+  total_pages: number;
+}
 
 function App() {
-  const [imageArray, setImageArray] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [valueForSearch, setValueForSearch] = useState('');
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [loadMoreButton, setLoadMoreButton] = useState(false);
-  const [notification, setNotification] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalImage, setModalImage] = useState(null);
-  const imgGalleryRef = useRef(null);
+  const [imageArray, setImageArray] = useState<ImgArray | null>(null);
+  const [valueForSearch, setValueForSearch] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [loadMoreButton, setLoadMoreButton] = useState<boolean>(false);
+  const [modalImage, setModalImage] = useState<ImgDetails | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [notification, setNotification] = useState<boolean>(false);
+  const imgGalleryRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     if (!valueForSearch.length) {
       return;
     }
-    const fetchFunction = async () => {
+    async function fetchFunction(): Promise<void> {
       try {
         setLoadMoreButton(false);
         setLoading(true);
         setError(false);
-        const data = await splashRequest(currentPage, valueForSearch);
-        setImageArray(prev =>
-          prev ? prev.concat(data.results) : data.results
+        const { results, total_pages }: SplashData = await splashRequest(
+          currentPage,
+          valueForSearch
         );
-        if (data.total_pages > currentPage) {
+        setImageArray(prev => (prev ? [...prev, ...results] : results));
+        if (total_pages > currentPage) {
           setLoadMoreButton(true);
-        } else if (data.total_pages === currentPage || data.total_pages === 0) {
+        } else if (total_pages === currentPage || total_pages === 0) {
           setNotification(true);
         }
       } catch (error) {
@@ -44,20 +51,21 @@ function App() {
       } finally {
         setLoading(false);
       }
-    };
+    }
     fetchFunction();
   }, [valueForSearch, currentPage]);
 
   useLayoutEffect(() => {
     if (imgGalleryRef.current !== null && currentPage > 1) {
-      const elemHeight =
-        imgGalleryRef.current.lastChild.getBoundingClientRect().height;
-      const valueForScrollWindow = Math.ceil(elemHeight * 2.5);
+      const elemHeight: number = (
+        imgGalleryRef.current?.lastChild as HTMLElement
+      ).getBoundingClientRect().height;
+      const valueForScrollWindow: number = Math.ceil(elemHeight * 2.5);
       window.scrollBy({ top: valueForScrollWindow, behavior: 'smooth' });
     }
   }, [imageArray, currentPage]);
 
-  const onSearch = value => {
+  const onSearch = (value: string): void => {
     if (value === valueForSearch) {
       return;
     }
@@ -67,11 +75,11 @@ function App() {
     setImageArray(null);
   };
 
-  const onClick = () => {
+  const onClick = (): void => {
     setCurrentPage(currentPage + 1);
   };
 
-  const onImageClick = obj => {
+  const onImageClick = (obj: ImgDetails): void => {
     setIsModalOpen(true);
     setModalImage(obj);
   };
@@ -83,8 +91,8 @@ function App() {
         {Array.isArray(imageArray) && imageArray.length && (
           <ImageGallery
             imgData={imageArray}
-            ref={imgGalleryRef}
             onClick={onImageClick}
+            ref={imgGalleryRef}
           />
         )}
         {loading && <Loader />}

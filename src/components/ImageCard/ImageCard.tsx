@@ -1,6 +1,13 @@
+import { FC } from 'react';
+import { ImgDetails, ImgInstance } from '../../types';
 import css from './ImageCard.module.css';
 
-const ImageCard = ({
+interface ImageCardProps {
+  imgData: Omit<ImgInstance, 'id'>;
+  onClick: (obj: ImgDetails) => void;
+}
+
+const ImageCard: FC<ImageCardProps> = ({
   imgData: {
     urls: { small, regular },
     alt_description,
